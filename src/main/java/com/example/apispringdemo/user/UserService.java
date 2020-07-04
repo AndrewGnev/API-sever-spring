@@ -24,4 +24,24 @@ public class UserService {
 
         return repository.saveAndFlush(new UserEntity(username, email)).getId();
     }
+
+    public UserEntity getUser(long id) {
+        if (!repository.existsById(id)) {
+            throw new IllegalArgumentException("user doesn`t exist");
+        }
+
+        return repository.findById(id);
+    }
+
+    public OnlineStatus setUserStatus(long id, OnlineStatus status) {
+        if (!repository.existsById(id)) {
+            throw new IllegalArgumentException("user doesn`t exist");
+        }
+
+        final UserEntity user = repository.getOne(id);
+        final OnlineStatus oldStatus = user.getStatus();
+        user.setStatus(status);
+
+        return oldStatus;
+    }
 }

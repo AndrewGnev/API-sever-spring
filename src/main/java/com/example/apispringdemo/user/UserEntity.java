@@ -17,8 +17,8 @@ public class UserEntity {
     @Column(unique = true, nullable = false)
     private final String email;
 
+    @Column(nullable = false)
     @Enumerated(value = EnumType.STRING)
-    @Column(unique = true, nullable = false)
     private OnlineStatus status;
 
     public UserEntity() {

@@ -1,12 +1,10 @@
 package com.example.apispringdemo.user.api.v1;
 
+import com.example.apispringdemo.user.OnlineStatus;
+import com.example.apispringdemo.user.UserEntity;
 import com.example.apispringdemo.user.UserService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
@@ -20,16 +18,39 @@ public class UserController {
     }
 
     @PostMapping
-    ResponseEntity<AddUserResponseDto> post(
+    long post(
             @RequestParam("username") String username,
             @RequestParam("email") String email
     ) {
         try {
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new AddUserResponseDto(service.addUser(username, email)));
+            return service.addUser(username, email);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new AddUserResponseDto(e.getMessage()));
+            throw new ResponseStatusException(HttpStatus.CONFLICT, e.getMessage(), e);
         }
+    }
+
+    @GetMapping("/{id}")
+    UserDto get(@PathVariable("id") long id) {
+        try {
+            return entityToDto(service.getUser(id));
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+    @PutMapping("/{id}")
+    UserStatusDto put(
+            @PathVariable("id") long id,
+            @RequestParam("status") OnlineStatus status
+    ) {
+        try {
+            return new UserStatusDto(id, service.setUserStatus(id, status), status);
+        } catch (IllegalArgumentException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage(), e);
+        }
+    }
+
+    private static UserDto entityToDto(UserEntity entity) {
+        return new UserDto(entity.getId(), entity.getUsername(), entity.getEmail(), entity.getStatus());
     }
 }
