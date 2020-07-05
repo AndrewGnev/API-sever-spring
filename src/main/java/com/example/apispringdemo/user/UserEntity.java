@@ -35,6 +35,13 @@ public class UserEntity {
         this.status = OnlineStatus.OFFLINE;
     }
 
+    public UserEntity(long id, String username, String email) {
+        this.id = id;
+        this.username = Objects.requireNonNull(username);
+        this.email = Objects.requireNonNull(email);
+        this.status = OnlineStatus.OFFLINE;
+    }
+
     public Long getId() {
         return id;
     }
@@ -53,5 +60,21 @@ public class UserEntity {
 
     public void setStatus(OnlineStatus status) {
         this.status = Objects.requireNonNull(status);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserEntity entity = (UserEntity) o;
+        return Objects.equals(id, entity.id) &&
+                username.equals(entity.username) &&
+                email.equals(entity.email) &&
+                status == entity.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email, status);
     }
 }
