@@ -1,5 +1,6 @@
 package com.example.apispringdemo.user;
 
+import org.apache.catalina.User;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,7 +78,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenUserDoesntExist_thenThrowsException() {
+    public void whenGetUserUserDoesntExist_thenThrowsException() {
         when(repository.existsById(anyLong())).thenReturn(false);
 
         try {
@@ -93,7 +94,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void whenUserExists_thenReturnsUserEntity() {
+    public void whenGetUserUserExists_thenReturnsUserEntity() {
         when(repository.existsById(anyLong())).thenReturn(true);
 
         final UserEntity entity = new UserEntity(228, "", "");
@@ -109,5 +110,36 @@ public class UserServiceTest {
 
     }
 
-    // TODO test setUserStatus
+    @Test
+    public void whenSetUserStatusUserDoesntExist_thenThrowsException() {
+        when(repository.existsById(anyLong())).thenReturn(false);
+
+        try {
+            service.setUserStatus(228, OnlineStatus.ONLINE);
+            fail("exception wasn't thrown");
+        } catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(), "wrong exception thrown");
+            assertEquals("user doesn't exist", e.getMessage(), "wrong exception message");
+        }
+
+        verify(repository, atMost(1)).existsById(228L);
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    public void whenSetUserStatusPassed_thenOldStatusIsCorrectAndChanged() {
+        when(repository.existsById(anyLong())).thenReturn(true);
+
+        final UserEntity entity = new UserEntity(228L, "u", "mylo", OnlineStatus.ONLINE);
+        when(repository.getOne(anyLong())).thenReturn(entity);
+
+        assertSame(OnlineStatus.ONLINE, service.setUserStatus(228L, OnlineStatus.OFFLINE),
+                "wrong status returned");
+        assertSame(OnlineStatus.OFFLINE, entity.getStatus(), "user status wasn't changed");
+
+        verify(repository, atMost(1)).existsById(228L);
+        verify(repository, atMost(1)).getOne(228L);
+        verifyNoMoreInteractions(repository);
+    }
+
 }
