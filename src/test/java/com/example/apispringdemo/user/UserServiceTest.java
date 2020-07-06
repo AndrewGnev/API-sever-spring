@@ -1,5 +1,6 @@
 package com.example.apispringdemo.user;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,8 +8,9 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -29,16 +31,14 @@ public class UserServiceTest {
 
         try {
             service.addUser("oaoaoa", "mmmm");
-            fail("exception doesn't thrown");
-        } catch (IllegalArgumentException e) {
+            fail("exception wasn't thrown");
+        } catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(), "wrong exception thrown");
             assertEquals("username is already busy", e.getMessage(), "wrong exception message");
-        } catch (Throwable e) {
-            fail("wrong exception thrown");
         }
 
         verify(repository, atMost(1)).existsByUsername(eq("oaoaoa"));
         verify(repository, atMost(1)).existsByEmail(eq("mmmm"));
-        verify(repository, atMost(0)).saveAndFlush(any());
         verifyNoMoreInteractions(repository);
     }
 
@@ -49,16 +49,14 @@ public class UserServiceTest {
 
         try {
             service.addUser("oaoaoa", "mmmm");
-            fail("exception doesn't thrown");
-        } catch (IllegalArgumentException e) {
+            fail("exception wasn't thrown");
+        } catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(), "wrong exception thrown");
             assertEquals("email is already busy", e.getMessage(), "wrong exception message");
-        } catch (Throwable e) {
-            fail("wrong exception thrown");
         }
 
         verify(repository, atMost(1)).existsByUsername(eq("oaoaoa"));
         verify(repository, atMost(1)).existsByEmail(eq("mmmm"));
-        verify(repository, atMost(0)).saveAndFlush(any());
         verifyNoMoreInteractions(repository);
     }
 
@@ -78,5 +76,38 @@ public class UserServiceTest {
         verifyNoMoreInteractions(repository);
     }
 
-    // TODO test getUser, setUserStatus
+    @Test
+    public void whenUserDoesntExist_thenThrowsException() {
+        when(repository.existsById(anyLong())).thenReturn(false);
+
+        try {
+            service.getUser(228);
+            fail("exception wasn't thrown");
+        } catch (Exception e) {
+            assertEquals(IllegalArgumentException.class, e.getClass(), "wrong exception thrown");
+            assertEquals("user doesn't exist", e.getMessage(), "wrong exception message");
+        }
+
+        verify(repository, atMost(1)).existsById(eq(228L));
+        verifyNoMoreInteractions(repository);
+    }
+
+    @Test
+    public void whenUserExists_thenReturnsUserEntity() {
+        when(repository.existsById(anyLong())).thenReturn(true);
+
+        final UserEntity entity = new UserEntity(228, "", "");
+        when(repository.findById(228)).thenReturn(entity);
+
+        final UserEntity result = service.getUser(228);
+        assertSame(entity, result, "wrong entity returned");
+        assertEquals(new UserEntity(228, "", ""), result, "entity was modified");
+
+        verify(repository, atMost(1)).existsById(eq(228L));
+        verify(repository, atMost(1)).findById(eq(228L));
+        verifyNoMoreInteractions(repository);
+
+    }
+
+    // TODO test setUserStatus
 }
