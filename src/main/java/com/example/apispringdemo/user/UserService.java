@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class UserService {
+public class UserService implements IUserService{
 
     private final UserRepository repository;
 
@@ -27,7 +27,7 @@ public class UserService {
 
     public UserEntity getUser(long id) {
         if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("user doesn`t exist");
+            throw new IllegalArgumentException("user doesn't exist");
         }
 
         return repository.findById(id);
@@ -35,7 +35,7 @@ public class UserService {
 
     public OnlineStatus setUserStatus(long id, OnlineStatus status) {
         if (!repository.existsById(id)) {
-            throw new IllegalArgumentException("user doesn`t exist");
+            throw new IllegalArgumentException("user doesn't exist");
         }
 
         final UserEntity user = repository.getOne(id);
