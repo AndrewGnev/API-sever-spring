@@ -42,6 +42,13 @@ public class UserEntity {
         this.status = OnlineStatus.OFFLINE;
     }
 
+    public UserEntity(long id, String username, String email, OnlineStatus status) {
+        this.id = id;
+        this.username = Objects.requireNonNull(username);
+        this.email = Objects.requireNonNull(email);
+        this.status = Objects.requireNonNull(status);
+    }
+
     public Long getId() {
         return id;
     }
