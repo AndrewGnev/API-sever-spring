@@ -26,7 +26,9 @@ public class UserService implements IUserService {
             throw new IllegalArgumentException("email is already busy");
         }
 
-        return repository.saveAndFlush(new UserEntity(username, email)).getId();
+        final UserEntity user = repository.saveAndFlush(new UserEntity(username, email));
+        statusChangeService.addStatusChange(user, OnlineStatus.OFFLINE, System.currentTimeMillis());
+        return user.getId();
     }
 
     public UserEntity getUser(long id) {
@@ -46,8 +48,7 @@ public class UserService implements IUserService {
         final OnlineStatus oldStatus = user.getStatus();
         user.setStatus(status);
 
-        // TODO statusChangeService.addStatusChange(user.getId(), status, System.currentTimeMillis());
-
+        statusChangeService.addStatusChange(user, status, System.currentTimeMillis());
         return oldStatus;
     }
 }

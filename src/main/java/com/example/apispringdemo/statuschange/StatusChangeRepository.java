@@ -9,5 +9,7 @@ import java.util.List;
 @Repository
 public interface StatusChangeRepository extends JpaRepository<StatusChangeEntity, Long> {
 
-    List<StatusChangeEntity> findByStatusAndTimestampAfter(OnlineStatus status, long timestamp);
+    List<StatusChangeEntity> findByTimestampIsGreaterThanEqualOrderByTimestampDesc(long timestamp);
+    List<StatusChangeEntity>
+    findByUser_StatusAndTimestampIsGreaterThanEqualOrderByTimestampDesc(OnlineStatus status, long timestamp);
 }
