@@ -60,4 +60,20 @@ public class StatusChangeEntity {
     public long getTimestamp() {
         return timestamp;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StatusChangeEntity entity = (StatusChangeEntity) o;
+        return timestamp == entity.timestamp &&
+                Objects.equals(id, entity.id) &&
+                Objects.equals(user, entity.user) &&
+                status == entity.status;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, user, status, timestamp);
+    }
 }
