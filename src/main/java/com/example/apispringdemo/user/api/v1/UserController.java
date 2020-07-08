@@ -1,8 +1,8 @@
 package com.example.apispringdemo.user.api.v1;
 
+import com.example.apispringdemo.user.IUserService;
 import com.example.apispringdemo.user.OnlineStatus;
 import com.example.apispringdemo.user.UserEntity;
-import com.example.apispringdemo.user.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,9 +11,9 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/v1/user")
 public class UserController {
 
-    private final UserService service;
+    private final IUserService service;
 
-    public UserController(UserService service) {
+    public UserController(IUserService service) {
         this.service = service;
     }
 

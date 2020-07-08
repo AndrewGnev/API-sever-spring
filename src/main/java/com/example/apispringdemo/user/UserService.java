@@ -1,16 +1,20 @@
 package com.example.apispringdemo.user;
 
+import com.example.apispringdemo.statuschange.IStatusChangeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
-public class UserService implements IUserService{
+public class UserService implements IUserService {
 
     private final UserRepository repository;
 
-    public UserService(UserRepository repository) {
+    private final IStatusChangeService statusChangeService;
+
+    public UserService(UserRepository repository, IStatusChangeService statusChangeService) {
         this.repository = repository;
+        this.statusChangeService = statusChangeService;
     }
 
     public long addUser(String username, String email) {
@@ -41,6 +45,8 @@ public class UserService implements IUserService{
         final UserEntity user = repository.getOne(id);
         final OnlineStatus oldStatus = user.getStatus();
         user.setStatus(status);
+
+        // TODO statusChangeService.addStatusChange(user.getId(), status, System.currentTimeMillis());
 
         return oldStatus;
     }
