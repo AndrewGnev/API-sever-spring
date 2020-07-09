@@ -3,6 +3,8 @@ package com.example.apispringdemo.user.api.v1;
 import com.example.apispringdemo.user.IUserService;
 import com.example.apispringdemo.user.OnlineStatus;
 import com.example.apispringdemo.user.UserEntity;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -17,9 +19,12 @@ public class UserController {
         this.service = service;
     }
 
-    @PostMapping
+    @ApiOperation("add new user")
+    @PostMapping(produces = "application/json")
     long post(
+            @ApiParam("username for new user, must be unique")
             @RequestParam("username") String username,
+            @ApiParam("email of new user, must be unique")
             @RequestParam("email") String email
     ) {
         try {
@@ -29,8 +34,12 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{id}")
-    UserDto get(@PathVariable("id") long id) {
+    @ApiOperation("get user by id")
+    @GetMapping(path = "/{id}", produces = "application/json")
+    UserDto get(
+            @ApiParam("id of user")
+            @PathVariable("id") long id
+    ) {
         try {
             return entityToDto(service.getUser(id));
         } catch (IllegalArgumentException e) {
@@ -38,9 +47,12 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
+    @ApiOperation("change user`s online status")
+    @PutMapping(path = "/{id}", produces = "application/json")
     UserStatusDto put(
+            @ApiParam("id of user")
             @PathVariable("id") long id,
+            @ApiParam(allowableValues = "ONLINE, OFFLINE")
             @RequestParam("status") OnlineStatus status
     ) {
         try {
